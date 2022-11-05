@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c11 -Wall -Werror -Wextra -g -D_GNU_SOURCE
+CFLAGS = -std=c11 -Wall -Werror -Wextra -D_GNU_SOURCE
 OS := $(shell uname)
 
 all: s21_grep
@@ -12,6 +12,7 @@ test: rebuild
 	chmod +x test_leak_grep.sh
 	sh test_func_grep.sh
 	sh test_leak_grep.sh
+	make clean
 
 check: clean
 	cp ../../materials/linters/.clang-format ../../src/.clang-format
@@ -23,6 +24,7 @@ ifeq ($(OS), Darwin)
 else ifeq ($(OS), Linux)
 	CK_FORK=no valgrind --vgdb=no --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=RESULT_VALGRIND.txt ./s21_grep
 endif
+	make clean
 
 clean:
 	rm -rf s21_grep s21_grep.dSYM s21_grep_test.txt grep_test.txt

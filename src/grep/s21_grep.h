@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFF_SIZE 8192
+
 typedef struct flags {
   int e; /* Шаблон */
   int i; /* Игнорирует различия регистра */

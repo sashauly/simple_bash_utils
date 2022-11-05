@@ -13,8 +13,9 @@ void check_flags(flags* short_flags, char* pattern, int argc, char** argv) {
       case 'e':
         short_flags->e = 1;
         e_count++;
-        if (e_count > 1) snprintf(&pattern[strlen(pattern)], 4096, "%s", "|");
-        snprintf(&pattern[strlen(pattern)], 4096, "%s", optarg);
+        if (e_count > 1)
+          snprintf(&pattern[strlen(pattern)], BUFF_SIZE, "%s", "|");
+        snprintf(&pattern[strlen(pattern)], BUFF_SIZE, "%s", optarg);
         break;
       case 'i':
         short_flags->i = 1;
@@ -52,7 +53,7 @@ void check_flags(flags* short_flags, char* pattern, int argc, char** argv) {
     }
   }
   if (!short_flags->e && !short_flags->f)
-    snprintf(&pattern[strlen(pattern)], 4096, "%s", argv[optind++]);
+    snprintf(&pattern[strlen(pattern)], BUFF_SIZE, "%s", argv[optind++]);
 }
 
 /*
@@ -60,16 +61,16 @@ void check_flags(flags* short_flags, char* pattern, int argc, char** argv) {
  */
 void read_file_pattern(int* e_count, char* pattern, char** argv) {
   FILE* file_pattern = NULL;
-  char* buffer = calloc(4096, sizeof(char*));
+  char* buffer = calloc(BUFF_SIZE, sizeof(char*));
   if ((file_pattern = fopen(optarg, "r"))) {
-    while (fgets(buffer, 4096, file_pattern) != NULL) {
+    while (fgets(buffer, BUFF_SIZE, file_pattern) != NULL) {
       if (buffer[strlen(buffer) - 1] == '\n') buffer[strlen(buffer) - 1] = 0;
-      if (*e_count > 0) snprintf(&pattern[strlen(pattern)], 4096, "%s", "|");
-      snprintf(&pattern[strlen(pattern)], 4096, "%s", buffer);
+      if (*e_count > 0)
+        snprintf(&pattern[strlen(pattern)], BUFF_SIZE, "%s", "|");
+      snprintf(&pattern[strlen(pattern)], BUFF_SIZE, "%s", buffer);
       ++*e_count;
     }
     fclose(file_pattern);
-    // free(buffer);
   } else {
     fprintf(stderr, "s21_grep: %s: No such file or directory\n", argv[optind]);
   }
@@ -81,8 +82,7 @@ void read_file_pattern(int* e_count, char* pattern, char** argv) {
  */
 void search_matches(flags* short_flags, char* pattern, int file_count,
                     char** argv) {
-  char* buffer = calloc(4096, sizeof(char*));
-  // char buffer[4096] = {0};
+  char* buffer = calloc(BUFF_SIZE, sizeof(char*));
   int match = 0; /* Результат функции regexec() */
   regex_t regex; /* Указатель на область хранения буферного шаблона */
   regmatch_t regmatch[1] = {0};
@@ -101,7 +101,7 @@ void search_matches(flags* short_flags, char* pattern, int file_count,
     regcomp(&regex, pattern, cflag); /* Компиляция регулярного выражения */
 
     while (!feof(fp)) {
-      if (fgets(buffer, 4096, fp)) {
+      if (fgets(buffer, BUFF_SIZE, fp)) {
         match = regexec(&regex, buffer, 1, regmatch, 0);
         if (short_flags->v) {
           short_flags->o = 0;
@@ -148,21 +148,16 @@ void search_matches(flags* short_flags, char* pattern, int file_count,
     if (short_flags->l && line_matches) printf("%s\n", argv[optind]);
     regfree(&regex); /* Освобождение памяти от буферного шаблона regex */
     fclose(fp);
-    // free(buffer);
   } else if (!short_flags->s) {
     fprintf(stderr, "s21_grep: %s: No such file or directory\n", argv[optind]);
   }
-  // regfree(&regex); /* Освобождение памяти от буферного шаблона regex */
   free(buffer);
 }
 
 int main(int argc, char** argv) {
   flags short_flags = {0}; /* Инициализация структуры флагов */
-  char* pattern = calloc(4096, sizeof(char*));
-  // char pattern[4096] = {0};
+  char* pattern = calloc(BUFF_SIZE, sizeof(char*));
   check_flags(&short_flags, pattern, argc, argv);
-  /*pattern = realloc(pattern, strlen(pattern));
-  pattern[strlen(pattern) + 1] = '\0';*/
   int file_count = argc - optind; /* Счетчик файлов */
   while (optind < argc) {
     search_matches(&short_flags, pattern, file_count, argv);
