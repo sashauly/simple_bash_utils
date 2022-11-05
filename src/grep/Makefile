@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c11 -Wall -Werror -Wextra
+CFLAGS = -std=c11 -Wall -Werror -Wextra -g -D_GNU_SOURCE
 OS := $(shell uname)
 
 all: s21_grep
