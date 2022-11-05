@@ -4,7 +4,7 @@ OS := $(shell uname)
 
 all: s21_grep
 	
-s21_cat:
+s21_grep:
 	$(CC) $(CFLAGS) s21_grep.c -o s21_grep
 
 test: rebuild
