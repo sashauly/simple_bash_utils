@@ -13,8 +13,8 @@ void check_flags(flags* short_flags, char* pattern, int argc, char** argv) {
       case 'e':
         short_flags->e = 1;
         e_count++;
-        if (e_count > 1) strcat(pattern, "|");
-        strcat(pattern, optarg);
+        if (e_count > 1) snprintf(&pattern[strlen(pattern)], 4096, "%s", "|");
+        snprintf(&pattern[strlen(pattern)], 4096, "%s", optarg);
         break;
       case 'i':
         short_flags->i = 1;
@@ -52,7 +52,7 @@ void check_flags(flags* short_flags, char* pattern, int argc, char** argv) {
     }
   }
   if (!short_flags->e && !short_flags->f)
-    snprintf(pattern, 4096, "%s", argv[optind++]);
+    snprintf(&pattern[strlen(pattern)], 4096, "%s", argv[optind++]);
 }
 
 /*
@@ -64,11 +64,12 @@ void read_file_pattern(int* e_count, char* pattern, char** argv) {
   if ((file_pattern = fopen(optarg, "r"))) {
     while (fgets(buffer, 4096, file_pattern) != NULL) {
       if (buffer[strlen(buffer) - 1] == '\n') buffer[strlen(buffer) - 1] = 0;
-      if (*e_count > 0) strcat(pattern, "|");
-      strcat(pattern, buffer);
+      if (*e_count > 0) snprintf(&pattern[strlen(pattern)], 4096, "%s", "|");
+      snprintf(&pattern[strlen(pattern)], 4096, "%s", buffer);
       ++*e_count;
     }
     fclose(file_pattern);
+    // free(buffer);
   } else {
     fprintf(stderr, "s21_grep: %s: No such file or directory\n", argv[optind]);
   }
@@ -81,6 +82,7 @@ void read_file_pattern(int* e_count, char* pattern, char** argv) {
 void search_matches(flags* short_flags, char* pattern, int file_count,
                     char** argv) {
   char* buffer = calloc(4096, sizeof(char*));
+  // char buffer[4096] = {0};
   int match = 0; /* Результат функции regexec() */
   regex_t regex; /* Указатель на область хранения буферного шаблона */
   regmatch_t regmatch[1] = {0};
@@ -146,15 +148,18 @@ void search_matches(flags* short_flags, char* pattern, int file_count,
     if (short_flags->l && line_matches) printf("%s\n", argv[optind]);
     regfree(&regex); /* Освобождение памяти от буферного шаблона regex */
     fclose(fp);
-    free(buffer);
+    // free(buffer);
   } else if (!short_flags->s) {
     fprintf(stderr, "s21_grep: %s: No such file or directory\n", argv[optind]);
   }
+  // regfree(&regex); /* Освобождение памяти от буферного шаблона regex */
+  free(buffer);
 }
 
 int main(int argc, char** argv) {
   flags short_flags = {0}; /* Инициализация структуры флагов */
   char* pattern = calloc(4096, sizeof(char*));
+  // char pattern[4096] = {0};
   check_flags(&short_flags, pattern, argc, argv);
   pattern = realloc(pattern, strlen(pattern));
   int file_count = argc - optind; /* Счетчик файлов */
