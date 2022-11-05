@@ -161,8 +161,8 @@ int main(int argc, char** argv) {
   char* pattern = calloc(4096, sizeof(char*));
   // char pattern[4096] = {0};
   check_flags(&short_flags, pattern, argc, argv);
-  pattern = realloc(pattern, strlen(pattern));
-  pattern[strlen(pattern) + 1] = '\0';
+  /*pattern = realloc(pattern, strlen(pattern));
+  pattern[strlen(pattern) + 1] = '\0';*/
   int file_count = argc - optind; /* Счетчик файлов */
   while (optind < argc) {
     search_matches(&short_flags, pattern, file_count, argv);
