@@ -1,5 +1,5 @@
 # Simple Bash Utils
-> 04.11.2022
+> 06.11.2022
 
 ## This is an educational project, so it's no longer supported!
 ***This is the project in which Bash text utilities(cat, grep) are implemented for working with C programming language texts. These utilities (cat and grep) are often used in the Linux terminal. As part of the project is to learn the organization of the Bash utilities and solidify knowledge of structured programming.***
